@@ -23,13 +23,13 @@ const puppeteer = require("puppeteer");
     await page.click("#show_password");
     await page.click(".btn.btn-auth");
 
-    await page.waitForNetworkIdle({ idleTime: 500, timeout: 10000 });
+    await page.waitForNetworkIdle({ idleTime: 1000, timeout: 10000 });
     const menuSelector = `#tenant_apps [data-title="Voyager 7S"] a`;
     await page.waitForSelector(menuSelector);
 
     await page.click(menuSelector);
 
-    await page.waitForNetworkIdle({ idleTime: 500, timeout: 10000 });
+    await page.waitForNetworkIdle({ idleTime: 1000, timeout: 10000 });
 
     // WEB TAB 2
     pages = await browser.pages();
@@ -49,9 +49,10 @@ const puppeteer = require("puppeteer");
 
     for (let index = 2; index > 0; index++) {
         try {
-            await page.waitForNetworkIdle({ idleTime: 500, timeout: 10000 });
+            await page.waitForNetworkIdle({ idleTime: 1000, timeout: 10000 });
             await page2.goto(process.env.ADD_CROS_ET);
             await page2.setViewport({ width: 1080, height: 1024 });
+            await page.waitForNetworkIdle({ idleTime: 1000, timeout: 10000 });
 
             const date = worksheet[`A${index}`].w;
             const lookupCode = returnLookupCode(worksheet[`C${index}`].v);
@@ -64,9 +65,10 @@ const puppeteer = require("puppeteer");
             const entity = 'cso';
 
             const arrDate = date.split('/');
-            const numInvetario = `${lookupCode}${date.slice(-2)}M${arrDate[0]}${chargeCode.substring(0, 1)}`;
+            const numInvetario = `${lookupCode}${date.slice(-2)}M${arrDate[0]}${chargeCode.substring(0, 3).toUpperCase()}`;
 
             console.log({
+                Index : index,
                 Date: date,
                 LookupCode: lookupCode,
                 Notes: notes,
@@ -80,15 +82,16 @@ const puppeteer = require("puppeteer");
             });
 
             //Charge To
+            await page2.waitForSelector('#BillingProperty_LookupCode');
             await page2.type('#BillingProperty_LookupCode', entity);
             await page2.type('#BillingPerson_LookupCode', lookupCode.toLowerCase());
             await page2.type('#ChargeCode_LookupCode', chargeCode);
             await page2.click('#ChargeNotes_TextBox');
-            await page.waitForNetworkIdle({ idleTime: 500, timeout: 10000 });
+            await page.waitForNetworkIdle({ idleTime: 1000, timeout: 10000 });
             await page2.type('#ChargeNotes_TextBox', notes);
 
             //Payable To
-            await page2.type('#BilledProperty_LookupCode', lookupCode.toLowerCase());
+            await page2.type('#BilledProperty_LookupCode', worksheet[`B${index}`].v.toLowerCase());
             await page2.type('#BilledPerson_LookupCode', payee);
             await page2.type('#PayableAccount_LookupCode', account);
             await page2.type('#PayableInvNum_TextBox', numInvetario);
@@ -109,9 +112,10 @@ const puppeteer = require("puppeteer");
             //Finish
             await page2.click('#Body1');
             await page2.click('#BtnSave_Button');
-
+            await page.waitForNetworkIdle({ idleTime: 1000, timeout: 10000 });
 
         } catch (e) {
+            console.log(e);
             index = -1;
         }
     }
