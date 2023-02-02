@@ -47,7 +47,7 @@ const puppeteer = require("puppeteer");
     var workbook = XLSX.readFile(process.env.XLSX_PATH);
     let worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
-    for (let index = 2; index < 4; index++) {
+    for (let index = 2; index > 0; index++) {
         try {
             await page.waitForNetworkIdle({ idleTime: 500, timeout: 10000 });
             await page2.goto(process.env.ADD_CROS_ET);
