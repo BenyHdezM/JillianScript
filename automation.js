@@ -65,7 +65,10 @@ const puppeteer = require("puppeteer");
             const entity = 'cso';
 
             const arrDate = date.split('/');
-            const numInvetario = `${lookupCode}${date.slice(-2)}M${arrDate[0]}${chargeCode.substring(0, 3).toUpperCase()}`;
+
+            const randomNumber = Math.floor(Math.random() * 100);
+
+            const numInvetario = `${lookupCode}${date.slice(-2)}M${arrDate[0]}${chargeCode.substring(0, 3).toUpperCase()}${randomNumber}`;
 
             console.log({
                 Index : index,
@@ -123,10 +126,10 @@ const puppeteer = require("puppeteer");
 })();
 
 function returnLookupCode(name) {
-    var arrayWords = name.split(' ');
-    if (arrayWords[0] === "Conrac") {
+    var arrayWords = name.toLowerCase().split(' ');
+    if (arrayWords[0] == "conrac") {
         return arrayWords[arrayWords.length - 1];
     } else {
-        return arrayWords[0].toLow;
+        return arrayWords[0].toLowerCase();
     }
 }
