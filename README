@@ -1,2 +1,9 @@
 npm install 
 pkg automation.js
+
+
+USER_EMAIL='test@test.com'
+USER_PASSWORD='UserPassword'
+LOGIN_URL='https://Login.page.com'
+XLSX_PATH='./Book.xlsx'
+ADD_CROS_ET='https://FromPage=1'
