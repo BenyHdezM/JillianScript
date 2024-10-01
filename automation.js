@@ -4,6 +4,7 @@ var XLSX = require("xlsx");
 const puppeteer = require("puppeteer");
 const workbook = XLSX.readFile(process.env.XLSX_PATH);
 const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+const numerosGenerados = {};
 
 (async () => {
 
@@ -13,6 +14,7 @@ const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
     const username = process.env.USER_EMAIL;
     const password = process.env.USER_PASSWORD;
+    
 
     // LOGIN
     await page.goto(process.env.LOGIN_URL, { waitUntil: 'load', timeout: 0 });
@@ -28,7 +30,7 @@ const worksheet = workbook.Sheets[workbook.SheetNames[0]];
         await page.type('#Username', username);
         await page.type('#txtPassword', password);
         await page.click("#show_password");
-        await page.click(".btn.btn-auth");
+        await page.click(".btn.btn-login");
     }
 
     const menuSelector = `#tenant_apps [data-title="Voyager 7S"] a`;
@@ -45,7 +47,7 @@ const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     await page2.setViewport({ width: 1080, height: 1024 });
 
     await page2.waitForSelector('#cmdLogin');
-    await page2.select('#loginAlias', 'Test'); // ENABLE FOR TESTING
+    // await page2.select('#loginAlias', 'Test'); // ENABLE FOR TESTING
     if (await page2.$(`#cmdLogin`) !== null) await page2.click(`#cmdLogin`);
     else console.log('cmdLogin not found');
 
@@ -74,8 +76,8 @@ const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                 const payee = worksheet[`I${index}`].v;
                 const entity = 'cso';
                 const arrDate = date.split('/');
-                const randomNumber = Math.floor(Math.random() * 100);
-                const numInvetario = `${lookupCode}${date.slice(-2)}M${arrDate[0]}${chargeCode.substring(0, 3).toUpperCase()}${randomNumber}`;
+                const numInvetario = generarNumeroInventario(lookupCode, date, arrDate, chargeCode);
+                // const numInvetario = `${lookupCode}${date.slice(-2)}M${arrDate[0]}${chargeCode.substring(0, 3).toUpperCase()}${randomNumber}`;
 
                 console.log({
                     Index: index,
@@ -93,6 +95,7 @@ const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
                 // await page2.waitForNetworkIdle({ idleTime: 1000, timeout: 0 });
                 //Charge To
+                await page2.waitForNetworkIdle({ idleTime: 1000, timeout: 0 });
                 await page2.waitForSelector('#BillingProperty_LookupCode');
                 await page2.type('#BillingProperty_LookupCode', entity);
                 await page2.type('#BillingPerson_LookupCode', lookupCode.toLowerCase());
@@ -125,6 +128,7 @@ const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                 // Finish - Save
                 await page2.click('#Body1');
                 await page2.click('#BtnSave_Button');
+                await page2.waitForNetworkIdle({ idleTime: 1000, timeout: 0 });
             }
 
         } catch (e) {
@@ -142,4 +146,23 @@ function returnLookupCode(name) {
     } else {
         return arrayWords[0].toLowerCase();
     }
+}
+
+function generarNumeroInventario(lookupCode, date, arrDate, chargeCode) {
+    let randomNumber;
+    let numInventario;
+
+    do {
+        // Generamos un número aleatorio (ajusta según sea necesario)
+        randomNumber = Math.floor(Math.random() * 100);
+
+        // Creamos el número de inventario
+        numInventario = `${lookupCode}${date.slice(-2)}M${arrDate[0]}${chargeCode.substring(0, 3).toUpperCase()}${randomNumber}`;
+    } while (numerosGenerados[numInventario]);
+
+    // Si el número es único, lo almacenamos en el diccionario
+    numerosGenerados[numInventario] = true;
+
+    // Retornamos el número de inventario generado
+    return numInventario;
 }
