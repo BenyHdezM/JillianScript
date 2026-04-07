@@ -9,8 +9,26 @@ const numerosGenerados = {};
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+function getBrowserExecutable() {
+  if (process.env.CHROME_PATH) return process.env.CHROME_PATH;
+  if (process.platform === "win32") {
+    const edgePaths = [
+      "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+      "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
+    ];
+    for (const p of edgePaths) {
+      if (fs.existsSync(p)) return p;
+    }
+  }
+  return undefined;
+}
+
 (async () => {
-  const browser = await puppeteer.launch({ headless: true }); //Change False to see the browser
+  const browser = await puppeteer.launch({
+    headless: false, //Change False to see the browser
+    executablePath: getBrowserExecutable(),
+  });
+
   var pages = await browser.pages();
   const page = pages[pages.length - 1];
 
