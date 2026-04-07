@@ -25,7 +25,7 @@ function getBrowserExecutable() {
 
 (async () => {
   const browser = await puppeteer.launch({
-    headless: false, //Change False to see the browser
+    headless: true, //Change False to see the browser
     executablePath: getBrowserExecutable(),
   });
 
@@ -218,6 +218,7 @@ function getBrowserExecutable() {
     }
   }
   await browser.close();
+  prompt("Press Enter to Exit...");
 })();
 
 function returnLookupCode(name) {
